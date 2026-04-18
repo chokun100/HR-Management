@@ -61,4 +61,8 @@ export class CreateEmployeeDto {
   @IsBoolean()
   @IsOptional()
   socialSecurityEnabled?: boolean;
+
+  @IsNumber()
+  @IsOptional()
+  shiftId?: number;
 }

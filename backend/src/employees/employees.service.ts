@@ -45,7 +45,9 @@ export class EmployeesService {
 
   async update(id: number, data: Partial<Employee>) {
     await this.findOne(id);
-    await this.employeeRepository.update(id, data);
+    // Remove relation objects that TypeORM can't handle in update()
+    const { department, position, shift, leaves, attendances, ...updateData } = data as any;
+    await this.employeeRepository.update(id, updateData);
     return this.findOne(id);
   }
 
