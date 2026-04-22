@@ -4,6 +4,7 @@ import AppLayout from '@/components/AppLayout';
 import Modal from '@/components/Modal';
 import { api } from '@/lib/api';
 import { Employee, Department, Position, Shift } from "@/types";
+import { PencilSimple, Trash, MagnifyingGlass, Plus, Users } from '@phosphor-icons/react';
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -68,7 +69,7 @@ export default function EmployeesPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm('Are you sure you want to delete this employee?')) {
+    if (confirm('Delete this employee? This action cannot be undone.')) {
       await api.delete(`/employees/${id}`);
       load();
     }
@@ -79,27 +80,33 @@ export default function EmployeesPage() {
       <div className="page-header page-header-actions">
         <div>
           <h2>Employees</h2>
-          <p>Manage your workforce</p>
+          <p>Manage your team and their details</p>
         </div>
-        <button className="btn btn-primary" onClick={openCreate}>+ Add Employee</button>
+        <button className="btn btn-primary" onClick={openCreate}>
+          <Plus size={16} weight="bold" /> Add employee
+        </button>
       </div>
 
       <div className="table-wrapper">
         <div className="table-header">
-          <h3>All Employees ({employees.length})</h3>
+          <h3>All employees ({employees.length})</h3>
           <div className="search-box">
-            <span className="search-icon">🔍</span>
-            <input placeholder="Search employees..." value={search} onChange={(e) => setSearch(e.target.value)} />
+            <span className="search-icon"><MagnifyingGlass size={14} /></span>
+            <input placeholder="Search by name or code..." value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
         </div>
 
         {loading ? (
-          <div className="loading-spinner"><div className="spinner" /></div>
+          <div style={{ padding: 20 }}>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="skeleton skeleton-row" />
+            ))}
+          </div>
         ) : employees.length === 0 ? (
           <div className="empty-state">
-            <div className="icon">👥</div>
+            <div className="icon"><Users size={48} weight="duotone" /></div>
             <h3>No employees found</h3>
-            <p>Add your first employee to get started</p>
+            <p>Add your first employee to start building your directory</p>
           </div>
         ) : (
           <table>
@@ -112,25 +119,29 @@ export default function EmployeesPage() {
                 <th>Position</th>
                 <th>Shift</th>
                 <th>Status</th>
-                <th>Salary</th>
+                <th className="tabular-nums">Salary</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {employees.map((emp) => (
                 <tr key={emp.id}>
-                  <td style={{ fontWeight: 600, color: 'var(--accent-1)' }}>{emp.employeeCode}</td>
-                  <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{emp.firstName} {emp.lastName}</td>
+                  <td className="text-accent font-semibold">{emp.employeeCode}</td>
+                  <td className="text-primary font-semibold">{emp.firstName} {emp.lastName}</td>
                   <td>{emp.email || '-'}</td>
                   <td>{emp.department?.name || '-'}</td>
                   <td>{emp.position?.title || '-'}</td>
                   <td>{emp.shift?.name || '-'}</td>
                   <td><span className={`badge badge-${emp.status}`}>{emp.status}</span></td>
-                  <td style={{ fontWeight: 600 }}>฿{Number(emp.salary).toLocaleString()}</td>
+                  <td className="font-semibold tabular-nums">฿{Number(emp.salary).toLocaleString()}</td>
                   <td>
                     <div className="btn-group">
-                      <button className="btn btn-secondary btn-sm" onClick={() => openEdit(emp)}>✏️</button>
-                      <button className="btn btn-danger btn-sm" onClick={() => handleDelete(emp.id)}>🗑️</button>
+                      <button className="btn btn-secondary btn-sm btn-icon" onClick={() => openEdit(emp)} aria-label="Edit employee">
+                        <PencilSimple size={14} />
+                      </button>
+                      <button className="btn btn-danger btn-sm btn-icon" onClick={() => handleDelete(emp.id)} aria-label="Delete employee">
+                        <Trash size={14} />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -140,104 +151,104 @@ export default function EmployeesPage() {
         )}
       </div>
 
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title={editing ? 'Edit Employee' : 'Add Employee'}>
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title={editing ? 'Edit employee' : 'Add employee'}>
         <form onSubmit={handleSubmit}>
           <div className="form-row">
             <div className="form-group">
-              <label>Employee Code *</label>
+              <label>Employee code *</label>
               <input className="form-control" placeholder="EMP001" value={form.employeeCode} onChange={(e) => setForm({ ...form, employeeCode: e.target.value })} required />
             </div>
             <div className="form-group">
-              <label>Hire Date *</label>
+              <label>Hire date *</label>
               <input type="date" className="form-control" value={form.hireDate} onChange={(e) => setForm({ ...form, hireDate: e.target.value })} required />
             </div>
           </div>
           <div className="form-row">
             <div className="form-group">
-              <label>First Name *</label>
-              <input className="form-control" placeholder="John" value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} required />
+              <label>First name *</label>
+              <input className="form-control" placeholder="Somchai" value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} required />
             </div>
             <div className="form-group">
-              <label>Last Name *</label>
-              <input className="form-control" placeholder="Doe" value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} required />
+              <label>Last name *</label>
+              <input className="form-control" placeholder="Jaidee" value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} required />
             </div>
           </div>
           <div className="form-row">
             <div className="form-group">
               <label>Email</label>
-              <input type="email" className="form-control" placeholder="john@example.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+              <input type="email" className="form-control" placeholder="somchai@company.co.th" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
             </div>
           </div>
           <div className="form-row">
             <div className="form-group">
-              <label>National ID (Thai 13 digits)</label>
+              <label>National ID (13 digits)</label>
               <input className="form-control" placeholder="1123456789012" value={form.nationalId} onChange={(e) => setForm({ ...form, nationalId: e.target.value })} />
             </div>
             <div className="form-group">
               <label>Phone</label>
-              <input className="form-control" placeholder="0891234567" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              <input className="form-control" placeholder="089-123-4567" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
             </div>
           </div>
           <div className="form-row">
             <div className="form-group">
               <label>Department</label>
               <select className="form-control" value={form.departmentId} onChange={(e) => setForm({ ...form, departmentId: e.target.value })}>
-                <option value="">-- Select --</option>
+                <option value="">— Select —</option>
                 {departments.map((d: Department) => <option key={d.id} value={d.id}>{d.name}</option>)}
               </select>
             </div>
             <div className="form-group">
               <label>Position</label>
               <select className="form-control" value={form.positionId} onChange={(e) => setForm({ ...form, positionId: e.target.value })}>
-                <option value="">-- Select --</option>
+                <option value="">— Select —</option>
                 {positions.map((p: Position) => <option key={p.id} value={p.id}>{p.title}</option>)}
               </select>
             </div>
           </div>
           <div className="form-row">
             <div className="form-group">
-              <label>Shift (Working Hours)</label>
+              <label>Shift (working hours)</label>
               <select className="form-control" value={form.shiftId} onChange={(e) => setForm({ ...form, shiftId: e.target.value })}>
-                <option value="">-- No Shift Assigned --</option>
-                {shifts.map((s: Shift) => <option key={s.id} value={s.id}>{s.name} ({s.startTime} - {s.endTime})</option>)}
+                <option value="">— No shift assigned —</option>
+                {shifts.map((s: Shift) => <option key={s.id} value={s.id}>{s.name} ({s.startTime} – {s.endTime})</option>)}
               </select>
             </div>
             <div className="form-group">
               <label>Status</label>
               <select className="form-control" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
                 <option value="active">Active</option>
-                <option value="on_leave">On Leave</option>
+                <option value="on_leave">On leave</option>
                 <option value="resigned">Resigned</option>
               </select>
             </div>
           </div>
           <div className="form-row">
             <div className="form-group">
-              <label>Salary (฿)</label>
+              <label>Salary (THB)</label>
               <input type="number" className="form-control" placeholder="30000" value={form.salary} onChange={(e) => setForm({ ...form, salary: e.target.value })} />
             </div>
           </div>
           <div className="form-row">
             <div className="form-group">
-              <label>Provident Fund (%)</label>
-              <input type="number" step="0.1" className="form-control" placeholder="5" value={form.providentFundRate} onChange={(e) => setForm({ ...form, providentFundRate: e.target.value })} />
+              <label>Provident fund (%)</label>
+              <input type="number" step="0.1" className="form-control" placeholder="5.0" value={form.providentFundRate} onChange={(e) => setForm({ ...form, providentFundRate: e.target.value })} />
             </div>
             <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 30 }}>
               <input type="checkbox" id="socialSec" checked={form.socialSecurityEnabled} onChange={(e) => setForm({ ...form, socialSecurityEnabled: e.target.checked })} style={{ width: 20, height: 20 }} />
-              <label htmlFor="socialSec" style={{ marginBottom: 0 }}>Social Security (5%)</label>
+              <label htmlFor="socialSec" style={{ marginBottom: 0 }}>Social security (5%)</label>
             </div>
           </div>
           <div className="form-group">
-            <label>Date of Birth</label>
+            <label>Date of birth</label>
             <input type="date" className="form-control" value={form.dateOfBirth} onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })} />
           </div>
           <div className="form-group">
             <label>Address</label>
-            <input className="form-control" placeholder="Address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+            <input className="form-control" placeholder="123 Sukhumvit Rd, Bangkok" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
           </div>
           <div className="form-actions">
             <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-            <button type="submit" className="btn btn-primary">{editing ? 'Update' : 'Create'}</button>
+            <button type="submit" className="btn btn-primary">{editing ? 'Save changes' : 'Create employee'}</button>
           </div>
         </form>
       </Modal>

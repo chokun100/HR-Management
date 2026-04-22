@@ -12,6 +12,7 @@ import { OvertimeModule } from './overtime/overtime.module';
 import { ShiftModule } from './shift/shift.module';
 import { DocumentModule } from './document/document.module';
 import { AnnouncementModule } from './announcement/announcement.module';
+import { N8nModule } from './n8n/n8n.module';
 import { User, Employee, Department, Position, Leave, Attendance, Payroll, Overtime, Shift, Document, Announcement } from './entities';
 
 @Module({
@@ -34,6 +35,7 @@ import { User, Employee, Department, Position, Leave, Attendance, Payroll, Overt
     ShiftModule,
     DocumentModule,
     AnnouncementModule,
+    N8nModule,
   ],
 })
 export class AppModule {}

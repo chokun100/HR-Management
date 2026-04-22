@@ -4,9 +4,10 @@ import AppLayout from '@/components/AppLayout';
 import Modal from '@/components/Modal';
 import { api } from '@/lib/api';
 import { Position } from "@/types";
+import { Plus, PencilSimple, Trash } from '@phosphor-icons/react';
 
 export default function PositionsPage() {
-  const [positions, setPositions] = useState<Position[][]>([]);
+  const [positions, setPositions] = useState<Position[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Position | null>(null);
@@ -44,27 +45,32 @@ export default function PositionsPage() {
     <AppLayout>
       <div className="page-header page-header-actions">
         <div><h2>Positions</h2><p>Manage job titles and salary ranges</p></div>
-        <button className="btn btn-primary" onClick={openCreate}>+ Add Position</button>
+        <button className="btn btn-primary" onClick={openCreate}><Plus weight="bold" /> Add position</button>
       </div>
 
       <div className="table-wrapper">
-        <div className="table-header"><h3>All Positions ({positions.length})</h3></div>
-        {loading ? <div className="loading-spinner"><div className="spinner" /></div> : positions.length === 0 ? (
-          <div className="empty-state"><div className="icon">💼</div><h3>No positions</h3><p>Create your first position</p></div>
+        <div className="table-header"><h3>All positions ({positions.length})</h3></div>
+        {loading ? (
+          <div className="skeleton">
+            <div className="skeleton-row" />
+            <div className="skeleton-row" />
+            <div className="skeleton-row" />
+          </div>
+        ) : positions.length === 0 ? (
+          <div className="empty-state"><h3>No positions</h3><p>Create your first position to get started</p></div>
         ) : (
           <table>
-            <thead><tr><th>Title</th><th>Description</th><th>Salary Range</th><th>Employees</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Title</th><th>Description</th><th>Salary range</th><th>Actions</th></tr></thead>
             <tbody>
               {positions.map((p) => (
                 <tr key={p.id}>
-                  <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{p.title}</td>
+                  <td className="font-semibold text-primary">{p.title}</td>
                   <td>{p.description || '-'}</td>
                   <td>฿{Number(p.minSalary).toLocaleString()} - ฿{Number(p.maxSalary).toLocaleString()}</td>
-                  <td><span className="badge badge-active">{p.employees?.length || 0}</span></td>
                   <td>
                     <div className="btn-group">
-                      <button className="btn btn-secondary btn-sm" onClick={() => openEdit(p)}>✏️</button>
-                      <button className="btn btn-danger btn-sm" onClick={() => handleDelete(p.id)}>🗑️</button>
+                      <button className="btn btn-secondary btn-sm" onClick={() => openEdit(p)} aria-label="Edit position"><PencilSimple size={16} /></button>
+                      <button className="btn btn-danger btn-sm" onClick={() => handleDelete(p.id)} aria-label="Delete position"><Trash size={16} /></button>
                     </div>
                   </td>
                 </tr>
@@ -74,24 +80,24 @@ export default function PositionsPage() {
         )}
       </div>
 
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title={editing ? 'Edit Position' : 'Add Position'}>
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title={editing ? 'Edit position' : 'Add position'}>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Job Title *</label>
-            <input className="form-control" placeholder="e.g. Software Engineer" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+            <label htmlFor="pos-title">Job title *</label>
+            <input id="pos-title" className="form-control" placeholder="e.g. Software Engineer" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
           </div>
           <div className="form-group">
-            <label>Description</label>
-            <input className="form-control" placeholder="Brief description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+            <label htmlFor="pos-desc">Description</label>
+            <input id="pos-desc" className="form-control" placeholder="Brief description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
           </div>
           <div className="form-row">
             <div className="form-group">
-              <label>Min Salary (฿)</label>
-              <input type="number" className="form-control" placeholder="15000" value={form.minSalary} onChange={(e) => setForm({ ...form, minSalary: e.target.value })} />
+              <label htmlFor="pos-min">Min salary (฿)</label>
+              <input id="pos-min" type="number" className="form-control" placeholder="15000" value={form.minSalary} onChange={(e) => setForm({ ...form, minSalary: e.target.value })} />
             </div>
             <div className="form-group">
-              <label>Max Salary (฿)</label>
-              <input type="number" className="form-control" placeholder="50000" value={form.maxSalary} onChange={(e) => setForm({ ...form, maxSalary: e.target.value })} />
+              <label htmlFor="pos-max">Max salary (฿)</label>
+              <input id="pos-max" type="number" className="form-control" placeholder="50000" value={form.maxSalary} onChange={(e) => setForm({ ...form, maxSalary: e.target.value })} />
             </div>
           </div>
           <div className="form-actions">

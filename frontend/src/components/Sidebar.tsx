@@ -2,25 +2,45 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
+import {
+  ChartPie,
+  Megaphone,
+  Users,
+  Buildings,
+  Briefcase,
+  Clock,
+  FileText,
+  TreePalm,
+  CalendarCheck,
+  Timer,
+  Money,
+  SignOut,
+} from '@phosphor-icons/react';
 
 const navItems = [
-  { label: 'MAIN', items: [
-    { href: '/', icon: '📊', label: 'Dashboard' },
-    { href: '/announcements', icon: '📢', label: 'Announcements' },
-  ]},
-  { label: 'MANAGEMENT', items: [
-    { href: '/employees', icon: '👥', label: 'Employees' },
-    { href: '/departments', icon: '🏢', label: 'Departments' },
-    { href: '/positions', icon: '💼', label: 'Positions' },
-    { href: '/shifts', icon: '⏱️', label: 'Shifts' },
-    { href: '/documents', icon: '📄', label: 'Documents' },
-  ]},
-  { label: 'OPERATIONS', items: [
-    { href: '/leaves', icon: '🏖️', label: 'Leave Requests' },
-    { href: '/attendance', icon: '⏰', label: 'Attendance' },
-    { href: '/overtime', icon: '⌛', label: 'Overtime (OT)' },
-    { href: '/payroll', icon: '💰', label: 'Payroll' },
-  ]},
+  {
+    label: 'Overview', items: [
+      { href: '/', icon: ChartPie, label: 'Dashboard' },
+      { href: '/announcements', icon: Megaphone, label: 'Announcements' },
+    ]
+  },
+  {
+    label: 'Management', items: [
+      { href: '/employees', icon: Users, label: 'Employees' },
+      { href: '/departments', icon: Buildings, label: 'Departments' },
+      { href: '/positions', icon: Briefcase, label: 'Positions' },
+      { href: '/shifts', icon: Clock, label: 'Shifts' },
+      { href: '/documents', icon: FileText, label: 'Documents' },
+    ]
+  },
+  {
+    label: 'Operations', items: [
+      { href: '/leaves', icon: TreePalm, label: 'Leave Requests' },
+      { href: '/attendance', icon: CalendarCheck, label: 'Attendance' },
+      { href: '/overtime', icon: Timer, label: 'Overtime' },
+      { href: '/payroll', icon: Money, label: 'Payroll' },
+    ]
+  },
 ];
 
 export default function Sidebar() {
@@ -28,7 +48,7 @@ export default function Sidebar() {
   const { user, logout } = useAuth();
 
   return (
-    <aside className="sidebar">
+    <aside className="sidebar" aria-label="Main navigation">
       <div className="sidebar-logo">
         <div className="logo-icon">HR</div>
         <div>
@@ -41,16 +61,23 @@ export default function Sidebar() {
         {navItems.map((group) => (
           <div key={group.label}>
             <div className="nav-label">{group.label}</div>
-            {group.items.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`nav-item ${pathname === item.href ? 'active' : ''}`}
-              >
-                <span className="icon">{item.icon}</span>
-                <span>{item.label}</span>
-              </Link>
-            ))}
+            {group.items.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`nav-item ${isActive ? 'active' : ''}`}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  <span className="icon">
+                    <Icon size={18} weight={isActive ? 'fill' : 'regular'} />
+                  </span>
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
           </div>
         ))}
       </nav>
@@ -64,8 +91,8 @@ export default function Sidebar() {
             <div className="name">{user?.username || 'User'}</div>
             <div className="role">{user?.role || 'employee'}</div>
           </div>
-          <button className="logout-btn" onClick={logout} title="Logout">
-            🚪
+          <button className="logout-btn" onClick={logout} title="Sign out" aria-label="Sign out">
+            <SignOut size={18} />
           </button>
         </div>
       </div>

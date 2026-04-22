@@ -2,11 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Announcement } from '../entities';
+import { N8nService } from '../n8n/n8n.service';
 
 @Injectable()
 export class AnnouncementService {
   constructor(
     @InjectRepository(Announcement) private announcementRepository: Repository<Announcement>,
+    private n8nService: N8nService,
   ) {}
 
   findAll(activeOnly = true) {
@@ -23,9 +25,14 @@ export class AnnouncementService {
     return ann;
   }
 
-  create(data: Partial<Announcement>) {
+  async create(data: Partial<Announcement>) {
     const ann = this.announcementRepository.create(data);
-    return this.announcementRepository.save(ann);
+    const saved = await this.announcementRepository.save(ann);
+    
+    // ส่ง Webhook ไปหา n8n เมื่อมีการประกาศเรื่องใหม่
+    this.n8nService.triggerWorkflow('new_announcement', saved);
+    
+    return saved;
   }
 
   async update(id: number, data: Partial<Announcement>) {

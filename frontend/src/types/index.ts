@@ -6,6 +6,8 @@ export interface Employee {
   email: string | null;
   phone: string | null;
   nationalId: string | null;
+  address: string | null;
+  dateOfBirth: string | null;
   hireDate: string;
   status: 'active' | 'on_leave' | 'resigned';
   salary: number;

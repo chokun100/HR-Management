@@ -4,9 +4,10 @@ import AppLayout from '@/components/AppLayout';
 import Modal from '@/components/Modal';
 import { api } from '@/lib/api';
 import { PayrollRecord } from "@/types";
+import { Plus, Check, Coins } from '@phosphor-icons/react';
 
 export default function PayrollPage() {
-  const [payrolls, setPayrolls] = useState<PayrollRecord[][]>([]);
+  const [payrolls, setPayrolls] = useState<PayrollRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [showGenerate, setShowGenerate] = useState(false);
   const now = new Date();
@@ -47,52 +48,58 @@ export default function PayrollPage() {
     <AppLayout>
       <div className="page-header page-header-actions">
         <div><h2>Payroll</h2><p>Manage employee salaries and payments</p></div>
-        <button className="btn btn-primary" onClick={() => setShowGenerate(true)}>💰 Generate Payroll</button>
+        <button className="btn btn-primary" onClick={() => setShowGenerate(true)}><Coins size={16} /> Generate payroll</button>
       </div>
 
-      <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
+      <div className="filter-bar" style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
         <select className="form-control" style={{ width: 150 }} value={filterMonth} onChange={(e) => setFilterMonth(e.target.value)}>
-          <option value="">All Months</option>
+          <option value="">All months</option>
           {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => (
             <option key={m} value={m}>{new Date(2000, m - 1).toLocaleString('en', { month: 'long' })}</option>
           ))}
         </select>
         <select className="form-control" style={{ width: 120 }} value={filterYear} onChange={(e) => setFilterYear(e.target.value)}>
-          <option value="">All Years</option>
+          <option value="">All years</option>
           {[2024,2025,2026,2027].map(y => <option key={y} value={y}>{y}</option>)}
         </select>
         {payrolls.length > 0 && (
-          <div style={{ marginLeft: 'auto', padding: '8px 16px', background: 'rgba(16,185,129,0.1)', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Total Net:</span>
-            <span style={{ fontSize: 16, fontWeight: 800, color: '#10b981' }}>฿{totalNet.toLocaleString()}</span>
+          <div className="summary-pill" style={{ marginLeft: 'auto', padding: '8px 16px', background: 'rgba(16,185,129,0.1)', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span className="text-muted" style={{ fontSize: 13 }}>Total net:</span>
+            <span className="text-accent font-semibold" style={{ fontSize: 16 }}>฿{totalNet.toLocaleString()}</span>
           </div>
         )}
       </div>
 
       <div className="table-wrapper">
-        <div className="table-header"><h3>Payroll Records ({payrolls.length})</h3></div>
-        {loading ? <div className="loading-spinner"><div className="spinner" /></div> : payrolls.length === 0 ? (
-          <div className="empty-state"><div className="icon">💰</div><h3>No payroll records</h3><p>Generate payroll for a month</p></div>
+        <div className="table-header"><h3>Payroll records ({payrolls.length})</h3></div>
+        {loading ? (
+          <div className="skeleton">
+            <div className="skeleton-row" />
+            <div className="skeleton-row" />
+            <div className="skeleton-row" />
+          </div>
+        ) : payrolls.length === 0 ? (
+          <div className="empty-state"><Coins size={32} className="text-muted" /><h3>No payroll records</h3><p>Generate payroll for a month to get started</p></div>
         ) : (
           <table>
-            <thead><tr><th>Employee</th><th>Period</th><th>Base Salary</th><th>Bonus</th><th>OT</th><th>Deductions</th><th>Social Sec.</th><th>Prov. Fund</th><th>Tax</th><th>Net Salary</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Employee</th><th>Period</th><th>Base salary</th><th>Bonus</th><th>OT</th><th>Deductions</th><th>Social sec.</th><th>Prov. fund</th><th>Tax</th><th>Net salary</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody>
               {payrolls.map((p) => (
                 <tr key={p.id}>
-                  <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{p.employee?.firstName} {p.employee?.lastName}</td>
+                  <td className="font-semibold text-primary">{p.employee?.firstName} {p.employee?.lastName}</td>
                   <td>{p.month}/{p.year}</td>
                   <td>฿{Number(p.baseSalary).toLocaleString()}</td>
-                  <td style={{ color: '#10b981' }}>+฿{Number(p.bonus).toLocaleString()}</td>
-                  <td style={{ color: '#10b981' }}>+฿{Number(p.otAmount || 0).toLocaleString()}</td>
-                  <td style={{ color: '#ef4444' }}>-฿{Number(p.deductions).toLocaleString()}</td>
-                  <td style={{ color: '#f59e0b' }}>-฿{Number(p.socialSecurity || 0).toLocaleString()}</td>
-                  <td style={{ color: '#f59e0b' }}>-฿{Number(p.providentFund || 0).toLocaleString()}</td>
-                  <td style={{ color: '#ef4444' }}>-฿{Number(p.tax).toLocaleString()}</td>
-                  <td style={{ fontWeight: 700, color: 'var(--text-primary)' }}>฿{Number(p.netSalary).toLocaleString()}</td>
+                  <td className="text-accent">+฿{Number(p.bonus).toLocaleString()}</td>
+                  <td className="text-accent">+฿{Number(p.otAmount || 0).toLocaleString()}</td>
+                  <td className="text-secondary">-฿{Number(p.deductions).toLocaleString()}</td>
+                  <td className="text-secondary">-฿{Number(p.socialSecurity || 0).toLocaleString()}</td>
+                  <td className="text-secondary">-฿{Number(p.providentFund || 0).toLocaleString()}</td>
+                  <td className="text-secondary">-฿{Number(p.tax).toLocaleString()}</td>
+                  <td className="font-semibold text-primary">฿{Number(p.netSalary).toLocaleString()}</td>
                   <td><span className={`badge badge-${p.isPaid ? 'paid' : 'unpaid'}`}>{p.isPaid ? 'Paid' : 'Unpaid'}</span></td>
                   <td>
                     {!p.isPaid && (
-                      <button className="btn btn-success btn-sm" onClick={() => handleMarkPaid(p.id)}>Mark Paid</button>
+                      <button className="btn btn-success btn-sm" onClick={() => handleMarkPaid(p.id)} aria-label="Mark as paid"><Check size={16} /> Paid</button>
                     )}
                   </td>
                 </tr>
@@ -102,29 +109,29 @@ export default function PayrollPage() {
         )}
       </div>
 
-      <Modal isOpen={showGenerate} onClose={() => setShowGenerate(false)} title="Generate Monthly Payroll">
-        <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 20 }}>
+      <Modal isOpen={showGenerate} onClose={() => setShowGenerate(false)} title="Generate monthly payroll">
+        <p className="text-secondary" style={{ fontSize: 14, marginBottom: 20 }}>
           This will generate payroll for all active employees for the selected month.
         </p>
         <div className="form-row">
           <div className="form-group">
-            <label>Month</label>
-            <select className="form-control" value={month} onChange={(e) => setMonth(Number(e.target.value))}>
+            <label htmlFor="payroll-month">Month</label>
+            <select id="payroll-month" className="form-control" value={month} onChange={(e) => setMonth(Number(e.target.value))}>
               {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => (
                 <option key={m} value={m}>{new Date(2000, m - 1).toLocaleString('en', { month: 'long' })}</option>
               ))}
             </select>
           </div>
           <div className="form-group">
-            <label>Year</label>
-            <select className="form-control" value={year} onChange={(e) => setYear(Number(e.target.value))}>
+            <label htmlFor="payroll-year">Year</label>
+            <select id="payroll-year" className="form-control" value={year} onChange={(e) => setYear(Number(e.target.value))}>
               {[2024,2025,2026,2027].map(y => <option key={y} value={y}>{y}</option>)}
             </select>
           </div>
         </div>
         <div className="form-actions">
           <button className="btn btn-secondary" onClick={() => setShowGenerate(false)}>Cancel</button>
-          <button className="btn btn-primary" onClick={handleGenerate}>💰 Generate</button>
+          <button className="btn btn-primary" onClick={handleGenerate}><Coins size={16} /> Generate</button>
         </div>
       </Modal>
     </AppLayout>

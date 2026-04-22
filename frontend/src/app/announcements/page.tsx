@@ -4,12 +4,13 @@ import AppLayout from '@/components/AppLayout';
 import Modal from '@/components/Modal';
 import { api } from '@/lib/api';
 import { Announcement } from "@/types";
+import { Plus, Trash, Megaphone } from '@phosphor-icons/react';
 
 export default function AnnouncementsPage() {
-  const [data, setData] = useState<Announcement[][]>([]);
+  const [data, setData] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
-  
+
   const [formData, setFormData] = useState({ title: '', content: '', priority: 'normal', author: 'HR Dept' });
 
   const loadData = async () => {
@@ -39,25 +40,33 @@ export default function AnnouncementsPage() {
     <AppLayout>
       <div className="page-header page-header-actions">
         <div><h2>Announcements</h2><p>Company-wide news and communications</p></div>
-        <button className="btn btn-primary" onClick={() => setShowAdd(true)}>+ New Announcement</button>
+        <button className="btn btn-primary" onClick={() => setShowAdd(true)}><Plus weight="bold" /> New announcement</button>
       </div>
 
       <div className="table-wrapper">
-        <div className="table-header"><h3>Recent Announcements ({data.length})</h3></div>
-        {loading ? <div className="loading-spinner"><div className="spinner"/></div> : data.length === 0 ? (
-          <div className="empty-state"><div className="icon">📢</div><h3>No announcements</h3></div>
+        <div className="table-header"><h3>Recent announcements ({data.length})</h3></div>
+        {loading ? (
+          <div className="skeleton">
+            <div className="skeleton-row" />
+            <div className="skeleton-row" />
+            <div className="skeleton-row" />
+          </div>
+        ) : data.length === 0 ? (
+          <div className="empty-state"><Megaphone size={32} className="text-muted" /><h3>No announcements</h3><p>Post an announcement to get started</p></div>
         ) : (
           <table>
-            <thead><tr><th>Title</th><th>Content Preview</th><th>Priority</th><th>Author</th><th>Date</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Title</th><th>Content preview</th><th>Priority</th><th>Author</th><th>Date</th><th>Actions</th></tr></thead>
             <tbody>
               {data.map(a => (
                 <tr key={a.id}>
-                  <td style={{fontWeight:600}}>{a.title}</td>
+                  <td className="font-semibold">{a.title}</td>
                   <td>{a.content.substring(0, 50)}...</td>
                   <td><span className={`badge badge-${a.priority === 'high' || a.priority === 'urgent' ? 'resigned' : 'active'}`}>{a.priority}</span></td>
                   <td>{a.author}</td>
                   <td>{new Date(a.createdAt).toLocaleDateString()}</td>
-                  <td><button className="btn btn-danger btn-sm" onClick={() => handleDelete(a.id)}>Delete</button></td>
+                  <td>
+                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(a.id)} aria-label="Delete announcement"><Trash size={16} /></button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -65,20 +74,20 @@ export default function AnnouncementsPage() {
         )}
       </div>
 
-      <Modal isOpen={showAdd} onClose={() => setShowAdd(false)} title="Post Announcement">
+      <Modal isOpen={showAdd} onClose={() => setShowAdd(false)} title="Post announcement">
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Title *</label>
-            <input type="text" className="form-control" required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
+            <label htmlFor="ann-title">Title *</label>
+            <input id="ann-title" type="text" className="form-control" required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
           </div>
           <div className="form-group">
-            <label>Content *</label>
-            <textarea className="form-control" rows={4} required value={formData.content} onChange={e => setFormData({...formData, content: e.target.value})} />
+            <label htmlFor="ann-content">Content *</label>
+            <textarea id="ann-content" className="form-control" rows={4} required value={formData.content} onChange={e => setFormData({...formData, content: e.target.value})} />
           </div>
           <div className="form-row">
             <div className="form-group">
-              <label>Priority</label>
-              <select className="form-control" value={formData.priority} onChange={e => setFormData({...formData, priority: e.target.value})}>
+              <label htmlFor="ann-priority">Priority</label>
+              <select id="ann-priority" className="form-control" value={formData.priority} onChange={e => setFormData({...formData, priority: e.target.value})}>
                 <option value="low">Low</option>
                 <option value="normal">Normal</option>
                 <option value="high">High</option>
@@ -86,8 +95,8 @@ export default function AnnouncementsPage() {
               </select>
             </div>
             <div className="form-group">
-              <label>Author</label>
-              <input type="text" className="form-control" value={formData.author} onChange={e => setFormData({...formData, author: e.target.value})} />
+              <label htmlFor="ann-author">Author</label>
+              <input id="ann-author" type="text" className="form-control" value={formData.author} onChange={e => setFormData({...formData, author: e.target.value})} />
             </div>
           </div>
           <div className="form-actions">

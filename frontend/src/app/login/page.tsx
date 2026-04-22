@@ -15,7 +15,6 @@ export default function LoginPage() {
     if (user) router.push('/');
   }, [user, router]);
 
-  // Seed default users on first load
   useEffect(() => {
     fetch('http://localhost:3001/api/auth/seed').catch(() => {});
   }, []);
@@ -27,7 +26,7 @@ export default function LoginPage() {
     try {
       await login(username, password);
     } catch (err: unknown) {
-      setError(err.message || 'Login failed');
+      setError((err as Error).message || 'Incorrect username or password');
     } finally {
       setLoading(false);
     }
@@ -38,41 +37,51 @@ export default function LoginPage() {
       <div className="login-card animate-in">
         <div className="logo-section">
           <div className="logo-box">HR</div>
-          <h2>Welcome Back</h2>
-          <p className="subtitle">Sign in to HR Management System</p>
+          <h2>Sign in</h2>
+          <p className="subtitle">Access your HR management dashboard</p>
         </div>
 
-        {error && <div className="login-error">{error}</div>}
+        {error && <div className="login-error" role="alert">{error}</div>}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <div className="form-group">
-            <label>Username</label>
+            <label htmlFor="username">Username</label>
             <input
+              id="username"
               type="text"
               className="form-control"
-              placeholder="Enter username"
+              placeholder="Enter your username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
+              autoComplete="username"
             />
           </div>
           <div className="form-group">
-            <label>Password</label>
+            <label htmlFor="password">Password</label>
             <input
+              id="password"
               type="password"
               className="form-control"
-              placeholder="Enter password"
+              placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              autoComplete="current-password"
             />
           </div>
-          <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign In'}
+          <button
+            type="submit"
+            className="btn btn-primary"
+            style={{ width: '100%' }}
+            disabled={loading}
+            aria-busy={loading}
+          >
+            {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
 
-        <p style={{ textAlign: 'center', marginTop: 24, fontSize: 13, color: 'var(--text-muted)' }}>
+        <p style={{ textAlign: 'center', marginTop: 28, fontSize: 13, color: 'var(--text-muted)' }}>
           Default: <strong>admin</strong> / <strong>admin123</strong>
         </p>
       </div>
