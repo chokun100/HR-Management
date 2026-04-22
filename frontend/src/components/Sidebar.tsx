@@ -2,25 +2,48 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
+import {
+  LayoutDashboard,
+  Megaphone,
+  Users,
+  Building2,
+  Briefcase,
+  Clock,
+  FileText,
+  Palmtree,
+  CalendarCheck,
+  Timer,
+  Banknote,
+  LogOut,
+} from 'lucide-react';
 
 const navItems = [
-  { label: 'MAIN', items: [
-    { href: '/', icon: '📊', label: 'Dashboard' },
-    { href: '/announcements', icon: '📢', label: 'Announcements' },
-  ]},
-  { label: 'MANAGEMENT', items: [
-    { href: '/employees', icon: '👥', label: 'Employees' },
-    { href: '/departments', icon: '🏢', label: 'Departments' },
-    { href: '/positions', icon: '💼', label: 'Positions' },
-    { href: '/shifts', icon: '⏱️', label: 'Shifts' },
-    { href: '/documents', icon: '📄', label: 'Documents' },
-  ]},
-  { label: 'OPERATIONS', items: [
-    { href: '/leaves', icon: '🏖️', label: 'Leave Requests' },
-    { href: '/attendance', icon: '⏰', label: 'Attendance' },
-    { href: '/overtime', icon: '⌛', label: 'Overtime (OT)' },
-    { href: '/payroll', icon: '💰', label: 'Payroll' },
-  ]},
+  {
+    label: 'MAIN',
+    items: [
+      { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
+      { href: '/announcements', icon: Megaphone, label: 'Announcements' },
+    ],
+  },
+  {
+    label: 'MANAGEMENT',
+    items: [
+      { href: '/employees', icon: Users, label: 'Employees' },
+      { href: '/departments', icon: Building2, label: 'Departments' },
+      { href: '/positions', icon: Briefcase, label: 'Positions' },
+      { href: '/shifts', icon: Clock, label: 'Shifts' },
+      { href: '/documents', icon: FileText, label: 'Documents' },
+    ],
+  },
+  {
+    label: 'OPERATIONS',
+    items: [
+      { href: '/leaves', icon: Palmtree, label: 'Leave Requests' },
+      { href: '/attendance', icon: CalendarCheck, label: 'Attendance' },
+      { href: '/overtime', icon: Timer, label: 'Overtime (OT)' },
+      { href: '/payroll', icon: Banknote, label: 'Payroll' },
+    ],
+  },
 ];
 
 export default function Sidebar() {
@@ -37,20 +60,27 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <nav className="sidebar-nav">
+      <nav className="sidebar-nav" aria-label="Main navigation">
         {navItems.map((group) => (
           <div key={group.label}>
             <div className="nav-label">{group.label}</div>
-            {group.items.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`nav-item ${pathname === item.href ? 'active' : ''}`}
-              >
-                <span className="icon">{item.icon}</span>
-                <span>{item.label}</span>
-              </Link>
-            ))}
+            {group.items.map((item) => {
+              const isActive = pathname === item.href;
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`nav-item ${isActive ? 'active' : ''}`}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  <span className="icon">
+                    <Icon size={18} strokeWidth={2} />
+                  </span>
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
           </div>
         ))}
       </nav>
@@ -64,8 +94,13 @@ export default function Sidebar() {
             <div className="name">{user?.username || 'User'}</div>
             <div className="role">{user?.role || 'employee'}</div>
           </div>
-          <button className="logout-btn" onClick={logout} title="Logout">
-            🚪
+          <button
+            className="logout-btn"
+            onClick={logout}
+            aria-label="Logout"
+            type="button"
+          >
+            <LogOut size={18} />
           </button>
         </div>
       </div>

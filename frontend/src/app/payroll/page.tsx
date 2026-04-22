@@ -4,6 +4,7 @@ import AppLayout from '@/components/AppLayout';
 import Modal from '@/components/Modal';
 import { api } from '@/lib/api';
 import { PayrollRecord } from "@/types";
+import { Banknote } from "lucide-react";
 
 export default function PayrollPage() {
   const [payrolls, setPayrolls] = useState<PayrollRecord[][]>([]);
@@ -47,7 +48,7 @@ export default function PayrollPage() {
     <AppLayout>
       <div className="page-header page-header-actions">
         <div><h2>Payroll</h2><p>Manage employee salaries and payments</p></div>
-        <button className="btn btn-primary" onClick={() => setShowGenerate(true)}>💰 Generate Payroll</button>
+        <button className="btn btn-primary" onClick={() => setShowGenerate(true)}"><Banknote size={16} /> Generate Payroll</button>
       </div>
 
       <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
@@ -64,7 +65,7 @@ export default function PayrollPage() {
         {payrolls.length > 0 && (
           <div style={{ marginLeft: 'auto', padding: '8px 16px', background: 'rgba(16,185,129,0.1)', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Total Net:</span>
-            <span style={{ fontSize: 16, fontWeight: 800, color: '#10b981' }}>฿{totalNet.toLocaleString()}</span>
+            <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--success)' }}>฿{totalNet.toLocaleString()}</span>
           </div>
         )}
       </div>
@@ -72,7 +73,7 @@ export default function PayrollPage() {
       <div className="table-wrapper">
         <div className="table-header"><h3>Payroll Records ({payrolls.length})</h3></div>
         {loading ? <div className="loading-spinner"><div className="spinner" /></div> : payrolls.length === 0 ? (
-          <div className="empty-state"><div className="icon">💰</div><h3>No payroll records</h3><p>Generate payroll for a month</p></div>
+          <div className="empty-state"><div className="icon" aria-hidden="true">💰</div><h3>No payroll records</h3><p>Generate payroll for a month</p></div>
         ) : (
           <table>
             <thead><tr><th>Employee</th><th>Period</th><th>Base Salary</th><th>Bonus</th><th>OT</th><th>Deductions</th><th>Social Sec.</th><th>Prov. Fund</th><th>Tax</th><th>Net Salary</th><th>Status</th><th>Actions</th></tr></thead>
@@ -82,12 +83,12 @@ export default function PayrollPage() {
                   <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{p.employee?.firstName} {p.employee?.lastName}</td>
                   <td>{p.month}/{p.year}</td>
                   <td>฿{Number(p.baseSalary).toLocaleString()}</td>
-                  <td style={{ color: '#10b981' }}>+฿{Number(p.bonus).toLocaleString()}</td>
-                  <td style={{ color: '#10b981' }}>+฿{Number(p.otAmount || 0).toLocaleString()}</td>
-                  <td style={{ color: '#ef4444' }}>-฿{Number(p.deductions).toLocaleString()}</td>
-                  <td style={{ color: '#f59e0b' }}>-฿{Number(p.socialSecurity || 0).toLocaleString()}</td>
-                  <td style={{ color: '#f59e0b' }}>-฿{Number(p.providentFund || 0).toLocaleString()}</td>
-                  <td style={{ color: '#ef4444' }}>-฿{Number(p.tax).toLocaleString()}</td>
+                  <td style={{ color: 'var(--success)' }}>+฿{Number(p.bonus).toLocaleString()}</td>
+                  <td style={{ color: 'var(--success)' }}>+฿{Number(p.otAmount || 0).toLocaleString()}</td>
+                  <td style={{ color: 'var(--danger)' }}>-฿{Number(p.deductions).toLocaleString()}</td>
+                  <td style={{ color: 'var(--warning)' }}>-฿{Number(p.socialSecurity || 0).toLocaleString()}</td>
+                  <td style={{ color: 'var(--warning)' }}>-฿{Number(p.providentFund || 0).toLocaleString()}</td>
+                  <td style={{ color: 'var(--danger)' }}>-฿{Number(p.tax).toLocaleString()}</td>
                   <td style={{ fontWeight: 700, color: 'var(--text-primary)' }}>฿{Number(p.netSalary).toLocaleString()}</td>
                   <td><span className={`badge badge-${p.isPaid ? 'paid' : 'unpaid'}`}>{p.isPaid ? 'Paid' : 'Unpaid'}</span></td>
                   <td>
@@ -108,23 +109,23 @@ export default function PayrollPage() {
         </p>
         <div className="form-row">
           <div className="form-group">
-            <label>Month</label>
-            <select className="form-control" value={month} onChange={(e) => setMonth(Number(e.target.value))}>
+            <label htmlFor="genMonth">Month</label>
+            <select id="genMonth" className="form-control" value={month} onChange={(e) => setMonth(Number(e.target.value))}>
               {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => (
                 <option key={m} value={m}>{new Date(2000, m - 1).toLocaleString('en', { month: 'long' })}</option>
               ))}
             </select>
           </div>
           <div className="form-group">
-            <label>Year</label>
-            <select className="form-control" value={year} onChange={(e) => setYear(Number(e.target.value))}>
+            <label htmlFor="genYear">Year</label>
+            <select id="genYear" className="form-control" value={year} onChange={(e) => setYear(Number(e.target.value))}>
               {[2024,2025,2026,2027].map(y => <option key={y} value={y}>{y}</option>)}
             </select>
           </div>
         </div>
         <div className="form-actions">
           <button className="btn btn-secondary" onClick={() => setShowGenerate(false)}>Cancel</button>
-          <button className="btn btn-primary" onClick={handleGenerate}>💰 Generate</button>
+          <button className="btn btn-primary" onClick={handleGenerate}><Banknote size={16} /> Generate</button>
         </div>
       </Modal>
     </AppLayout>

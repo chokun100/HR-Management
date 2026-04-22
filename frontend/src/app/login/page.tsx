@@ -27,7 +27,8 @@ export default function LoginPage() {
     try {
       await login(username, password);
     } catch (err: unknown) {
-      setError(err.message || 'Login failed');
+      const message = err instanceof Error ? err.message : 'Login failed';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -42,37 +43,57 @@ export default function LoginPage() {
           <p className="subtitle">Sign in to HR Management System</p>
         </div>
 
-        {error && <div className="login-error">{error}</div>}
+        {error && (
+          <div className="login-error" role="alert" aria-live="assertive">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Username</label>
+            <label htmlFor="username">Username</label>
             <input
+              id="username"
               type="text"
               className="form-control"
               placeholder="Enter username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
+              autoComplete="username"
             />
           </div>
           <div className="form-group">
-            <label>Password</label>
+            <label htmlFor="password">Password</label>
             <input
+              id="password"
               type="password"
               className="form-control"
               placeholder="Enter password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              autoComplete="current-password"
             />
           </div>
-          <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={loading}>
+          <button
+            type="submit"
+            className="btn btn-primary"
+            style={{ width: '100%', justifyContent: 'center' }}
+            disabled={loading}
+          >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
-        <p style={{ textAlign: 'center', marginTop: 24, fontSize: 13, color: 'var(--text-muted)' }}>
+        <p
+          style={{
+            textAlign: 'center',
+            marginTop: 24,
+            fontSize: 13,
+            color: 'var(--text-muted)',
+          }}
+        >
           Default: <strong>admin</strong> / <strong>admin123</strong>
         </p>
       </div>
